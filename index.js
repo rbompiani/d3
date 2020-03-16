@@ -29,7 +29,7 @@ d3.json('planets.json').then(data => {
     //remap vertical scale based on data max value
     const y = d3.scaleLinear()
         .domain([0, max])
-        .range([0, graphHeight]);
+        .range([graphHeight, 0]);
 
     //remap horizontal band widths based on number of entries and bar padding
     const x = d3.scaleBand()
@@ -52,14 +52,22 @@ d3.json('planets.json').then(data => {
     rects.enter()
         .append('rect')
         .attr('width', x.bandwidth)
-        .attr('height', d => y(d.orders))
+        .attr('height', d => graphHeight - y(d.orders))
         .attr('fill', 'orange')
-        .attr('x', d => x(d.name));
+        .attr('x', d => x(d.name))
+        .attr('y', d => y(d.orders));
 
     //create and call the axes
     const xAxis = d3.axisBottom(x);
-    const yAxis = d3.axisLeft(y);
+    const yAxis = d3.axisLeft(y)
+        .ticks(3)
+        .tickFormat(d => d + ' orders');
 
     xAxisGroup.call(xAxis);
     yAxisGroup.call(yAxis);
+
+    xAxisGroup.selectAll('text')
+        .attr('transform', 'rotate(-40)')
+        .attr('text-anchor', 'end')
+        .attr('fill', 'orange');
 })
