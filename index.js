@@ -11,7 +11,9 @@ d3.json('planets.json').then(data => {
 
     const x = d3.scaleBand()
         .domain(data.map(item => item.name))
-        .range([0, 500]);
+        .range([0, 500])
+        .paddingInner(0.2)
+        .paddingOuter(0.2);
 
 
     const rects = svg.selectAll('rects')
