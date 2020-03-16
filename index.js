@@ -14,7 +14,8 @@ const graph = svg.append('g')
     .attr('height', graphHeight)
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
-const xAxisGroup = graph.append('g');
+const xAxisGroup = graph.append('g')
+    .attr('transform', `translate(0,${graphHeight})`)
 const yAxisGroup = graph.append('g');
 
 // retrieve json data
@@ -28,7 +29,7 @@ d3.json('planets.json').then(data => {
     //remap vertical scale based on data max value
     const y = d3.scaleLinear()
         .domain([0, max])
-        .range([0, 500]);
+        .range([0, graphHeight]);
 
     //remap horizontal band widths based on number of entries and bar padding
     const x = d3.scaleBand()
@@ -54,4 +55,11 @@ d3.json('planets.json').then(data => {
         .attr('height', d => y(d.orders))
         .attr('fill', 'orange')
         .attr('x', d => x(d.name));
+
+    //create and call the axes
+    const xAxis = d3.axisBottom(x);
+    const yAxis = d3.axisLeft(y);
+
+    xAxisGroup.call(xAxis);
+    yAxisGroup.call(yAxis);
 })
