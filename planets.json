@@ -1,22 +1,18 @@
 [
     {
-        "radius": 50,
-        "distance": 110,
-        "fill": "orange"
+        "name": "veg soup",
+        "orders": 200
     },
     {
-        "radius": 70,
-        "distance": 260,
-        "fill": "red"
+        "name": "veg curry",
+        "orders": 600
     },
     {
-        "radius": 35,
-        "distance": 400,
-        "fill": "brown"
+        "name": "veg pasta",
+        "orders": 300
     },
     {
-        "radius": 55,
-        "distance": 530,
-        "fill": "green"
+        "name": "veg surprise",
+        "orders": 900
     }
 ]

@@ -2,21 +2,23 @@
 
 const svg = d3.select('svg');
 
+const y = d3.scaleLinear()
+    .domain([0, 1000])
+    .range([0, 500]);
+
 d3.json('planets.json').then(data => {
-    const circs = svg.selectAll('circle')
+    const rects = svg.selectAll('rects')
         .data(data);
 
-    //add attributes to existing circles in the DOM
-    circs.attr('cy', 200)
-        .attr('cx', d => d.distance)
-        .attr('r', d => d.radius)
-        .attr('fill', d => d.fill);
+    rects.attr('width', 50)
+        .attr('height', d => d.orders)
+        .attr('fill', 'orange')
+        .attr('x', (d, i) => i * 70);
 
-    // get the enter selection and append to the dom
-    circs.enter()
-        .append('circle')
-        .attr('cy', 200)
-        .attr('cx', d => d.distance)
-        .attr('r', d => d.radius)
-        .attr('fill', d => d.fill);
+    rects.enter()
+        .append('rect')
+        .attr('width', 50)
+        .attr('height', d => d.orders)
+        .attr('fill', 'orange')
+        .attr('x', (d, i) => i * 70);
 })
