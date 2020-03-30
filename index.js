@@ -46,6 +46,9 @@ xAxisGroup.selectAll('text')
     .attr('text-anchor', 'end')
     .attr('fill', 'orange');
 
+// variable for all transitions
+const t = d3.transition().duration(500);
+
 /* ----------- UPDATE FUNCTION ----------- */
 const update = (data) => {
 
@@ -64,10 +67,8 @@ const update = (data) => {
 
     // update shapes currently in DOM
     rects.attr('width', x.bandwidth)
-        .attr('height', d => graphHeight - y(d.orders))
         .attr('fill', 'orange')
-        .attr('x', d => x(d.name))
-        .attr('y', d => y(d.orders));
+        .attr('x', d => x(d.name));
 
     //create a rect for each data entry that does not find a rect above
     rects.enter()
@@ -77,7 +78,9 @@ const update = (data) => {
         .attr('fill', 'orange')
         .attr('x', d => x(d.name))
         .attr('y', graphHeight)
-        .transition().duration(500)
+        // add existing rects to this enter selection before updating
+        .merge(rects)
+        .transition(t)
         .attr('y', d => y(d.orders))
         .attr('height', d => graphHeight - y(d.orders));
 
