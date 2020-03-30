@@ -16,7 +16,7 @@ const graph = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
 const xAxisGroup = graph.append('g')
-    .attr('transform', `translate(0,${graphHeight})`)
+    .attr('transform', `translate(0,${graphHeight})`);
 const yAxisGroup = graph.append('g');
 
 /* retrieve json data
@@ -30,7 +30,7 @@ const y = d3.scaleLinear()
 
 //remap horizontal band widths based on number of entries and bar padding
 const x = d3.scaleBand()
-    .range([0, 500])
+    .range([0, graphWidth])
     .paddingInner(0.2)
     .paddingOuter(0.2);
 
@@ -49,43 +49,67 @@ xAxisGroup.selectAll('text')
 /* ----------- UPDATE FUNCTION ----------- */
 const update = (data) => {
 
+
+    //select all rects within the svg(currently, none)
+    const rects = graph.selectAll('rect')
+        .data(data);
+
+    console.log(rects);
+    // remove extra exit selection rectangles
+    rects.exit().remove();
+
     //update scale domains
     y.domain([0, d3.max(data, d => d.orders)]);
     x.domain(data.map(item => item.name));
 
-    //select all rects within the svg(currently, none)
-    const rects = graph.selectAll('rects')
-        .data(data);
-
-    // remove extra exit selection rectangles
-    rects.exit().remove();
-
     // update shapes currently in DOM
     rects.attr('width', x.bandwidth)
-        .attr('height', d => y(d.orders))
+        .attr('height', d => graphHeight - y(d.orders))
         .attr('fill', 'orange')
-        .attr('x', d => x(d.name));
+        .attr('x', d => x(d.name))
+        .attr('y', d => y(d.orders));
 
     //create a rect for each data entry that does not find a rect above
     rects.enter()
         .append('rect')
         .attr('width', x.bandwidth)
-        .attr('height', d => graphHeight - y(d.orders))
+        .attr('height', 0)
         .attr('fill', 'orange')
         .attr('x', d => x(d.name))
-        .attr('y', d => y(d.orders));
+        .attr('y', graphHeight)
+        .transition().duration(500)
+        .attr('y', d => y(d.orders))
+        .attr('height', d => graphHeight - y(d.orders));
 
     // call axes
     xAxisGroup.call(xAxis);
     yAxisGroup.call(yAxis);
 }
 
-/* ----------- CONNECT TO FIREBASE ----------- */
-db.collection('dishes').get().then(res => {
+var data = [];
 
-    var data = [];
-    res.docs.forEach(doc => {
-        data.push(doc.data());
+/* ----------- CONNECT TO FIREBASE ----------- */
+db.collection('dishes').onSnapshot(res => {
+
+
+
+    res.docChanges().forEach(change => {
+        const doc = { ...change.doc.data(), id: change.doc.id };
+        switch (change.type) {
+            case 'added':
+                data.push(doc);
+                break;
+            case 'modified':
+                const index = data.findIndex(item => item.id == doc.id);
+                data[index] = doc;
+                break;
+            case 'removed':
+                data = data.filter(item => item.id !== doc.id);
+                break;
+            default:
+                break;
+        }
+
     })
 
     update(data);
