@@ -47,7 +47,19 @@ xAxisGroup.selectAll('text')
     .attr('fill', 'orange');
 
 // variable for all transitions
-const t = d3.transition().duration(500);
+const t = d3.transition().duration(1000);
+
+const widthTween = (d) => {
+    //define interpolation
+    //d3.interpolate returns a function 
+    let i = d3.interpolate(0, x.bandwidth());
+
+    //return a function which takes in a time ticker 't'
+    return function (t) {
+        //return the vlaue from passing the ticker into the interpolation
+        return i(t);
+    }
+}
 
 /* ----------- UPDATE FUNCTION ----------- */
 const update = (data) => {
@@ -73,7 +85,6 @@ const update = (data) => {
     //create a rect for each data entry that does not find a rect above
     rects.enter()
         .append('rect')
-        .attr('width', x.bandwidth)
         .attr('height', 0)
         .attr('fill', 'orange')
         .attr('x', d => x(d.name))
@@ -81,6 +92,7 @@ const update = (data) => {
         // add existing rects to this enter selection before updating
         .merge(rects)
         .transition(t)
+        .attrTween('width', widthTween)
         .attr('y', d => y(d.orders))
         .attr('height', d => graphHeight - y(d.orders));
 
