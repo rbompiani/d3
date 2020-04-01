@@ -7,8 +7,7 @@ const svg = d3.select(".canvas")
     .attr('height', dims.height + 150);
 
 const graph = svg.append('g')
-    .attr('transform', `translate(${cent.x})`)
-    .attr('transform', `translate(${cent.y})`);
+    .attr('transform', `translate(${cent.x},${cent.y})`);
 
 const pie = d3.pie()
     .sort(null)
@@ -21,7 +20,15 @@ const arcPath = d3.arc()
 
 //update function
 const update = () => {
-    console.log(data);
+    const paths = graph.selectAll('path')
+        .data(pie(data));
+
+    paths.enter()
+        .append('path')
+        .attr('class', 'arc')
+        .attr('d', arcPath)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 3);
 }
 
 let data = [];
