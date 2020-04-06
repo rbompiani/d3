@@ -19,12 +19,20 @@ const arcPath = d3.arc()
 
 const color = d3.scaleOrdinal(d3['schemeSet3']);
 
+const legendGroup = svg.append('g').attr('transform', `translate(${dims.width + 40}, 10)`);
 
+const legend = d3.legendColor()
+    .shape('circle')
+    .shapePadding(10)
+    .scale(color);
 
 //update function
 const update = () => {
 
     color.domain(data.map(d => d.name));
+
+    legendGroup.call(legend);
+    legendGroup.selectAll('text').attr('fill', 'white');
 
     const paths = graph.selectAll('path')
         .data(pie(data));
