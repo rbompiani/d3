@@ -31,6 +31,20 @@ const yAxisGroup = graph.append('g')
 // line path element
 const path = graph.append('path');
 
+// create doted line group and append to graph
+const guides = graph.append('g')
+    .attr('class', 'guides')
+    .style('opacity', 0);
+
+const xGuide = guides.append('line')
+    .attr('stroke', '#aaa')
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', 4);
+const yGuide = guides.append('line')
+    .attr('stroke', '#aaa')
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', 4);
+
 // d3 line path generator
 const line = d3.line()
     .x(function (d) { return x(new Date(d.date)) })
@@ -77,6 +91,38 @@ const update = (data) => {
         .attr('cy', d => y(d.distance))
         .attr('fill', "#ccc");
 
+    // create point hover effects
+    graph.selectAll('circle')
+        .on('mouseover', (d, i, n) => {
+            d3.select(n[i])
+                .transition()
+                .duration(100)
+                .attr('r', 8)
+                .attr('fill', 'white');
+
+            xGuide
+                .attr('x1', x(new Date(d.date)))
+                .attr('x2', x(new Date(d.date)))
+                .attr('y1', graphHeight)
+                .attr('y2', y(d.distance));
+
+            yGuide
+                .attr('x1', 0)
+                .attr('x2', x(new Date(d.date)))
+                .attr('y1', y(d.distance))
+                .attr('y2', y(d.distance));
+
+            guides.style('opacity', 1);
+        })
+        .on('mouseleave', (d, i, n) => {
+            d3.select(n[i])
+                .transition()
+                .duration(100)
+                .attr('r', 4)
+                .attr('fill', '#ccc');
+
+            guides.style('opacity', 0);
+        })
 
     // create axes
     const xAxis = d3.axisBottom(x)
@@ -120,3 +166,4 @@ db.collection('activities').onSnapshot(res => {
 
     update(data);
 })
+
